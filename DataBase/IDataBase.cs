@@ -20,20 +20,20 @@ namespace DataBase
         /// <summary>
         /// 读取参数
         /// </summary>
-        /// <param name="key">参数名称</param>
+        /// <param name="name">参数名称</param>
         /// <returns>参数值</returns>
         Para GetParam(string name);
 
         /// <summary>
         /// 写入参数 
         /// </summary>
-        /// <param name="key">参数名称</param>
-        /// <param name="value">参数值</param>
+        /// <param name="para">参数</param>
         void SetParam(Para para);
 
         /// <summary>
         /// 写入数据或修改数据
         /// </summary>
+        /// <param name="data">待写入的数据</param>
         /// <returns></returns>
         void InsertData(T data);
 
@@ -41,7 +41,7 @@ namespace DataBase
         /// 查询数据
         /// </summary>
         /// <param name="queryCondition">查询条件</param>
-        /// <returns>数据</returns>
+        /// <returns>返回的数据集合</returns>
         IEnumerable<T> QueryData(object queryCondition);
 
         /// <summary>
@@ -50,6 +50,13 @@ namespace DataBase
         /// <param name="delCondition">删除条件</param>
         /// <returns>受影响数据数量</returns>
         int DeleteData(object delCondition);
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <param name="delCondition">删除条件,必须用where开头的字符串条件</param>
+        /// <returns>受影响数据数量</returns>
+        int DeleteData(string delConditionWhere);
     }
 
     public class Para
