@@ -1,9 +1,11 @@
 ﻿using System;
+using Dapper;
 using DataBase;
 
 namespace test
 {
-    class MyClass : RealTimeData
+    [Table("test.realtimedata")]
+    class realtimedata : RealTimeData
     {
         public int MyProperty { get; set; }
     }
@@ -15,10 +17,9 @@ namespace test
             string port = "3306";
             string user = "root";
             string password = "123456";
-            MySQLHelper<MyClass> mySQLHelper = new MySQLHelper<MyClass>(server,port,user,password);
-            mySQLHelper.Connect(server, port, user, password);
-            MyClass myClass = new MyClass();
-            myClass.DateTime = DateTime.Now;
+            MySQLHelper<realtimedata> mySQLHelper = new MySQLHelper<realtimedata>(server,port,user,password);
+            mySQLHelper.Connect();
+            realtimedata myClass = new realtimedata() { Value = 999, DateTime = DateTime.Now, MyProperty = 88 };
             for (int i = 0; i < 10; i++)
             {
                 mySQLHelper.InsertData(myClass);
