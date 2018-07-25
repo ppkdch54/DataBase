@@ -1,25 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using Dapper;
 
 namespace DataBase
 {
-    public class Para
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-    }
-
-    public class RealTimeData
-    {
-        [Key]
-        public int Id { get; set; }
-        public int Value { get; set; }
-        public DateTime DateTime { get; set; }
-    }
-
     public class MySQLHelper<T> : IDataBase<T> where T : RealTimeData
     {
         MySqlConnection mysqlConnection;
@@ -30,7 +14,7 @@ namespace DataBase
                 + ";user=" + user
                 + ";pwd=" + password + ";";
             mysqlConnection = new MySqlConnection(connStr);
-            Dapper.SimpleCRUD.SetDialect(Dapper.SimpleCRUD.Dialect.MySQL);
+            SimpleCRUD.SetDialect(SimpleCRUD.Dialect.MySQL);
         }
 
         public bool Connect()
@@ -42,38 +26,53 @@ namespace DataBase
 
         public void Disconnect()
         {
-            Close();
+            mysqlConnection.Close();
         }
 
-        public string GetParam(string key)
+        public void SetParam(Para para)
         {
-            throw new NotImplementedException();
+            mysqlConnection.Insert(para);
         }
 
-        public void InsertData(T t) 
+        public Para GetParam(string name)
+        {
+            return mysqlConnection.Get<Para>(new Para { Name = name });
+        }
+
+        public void InsertData(T t)
         {
             mysqlConnection.Insert(t);
         }
 
-        public IEnumerable<T> QueryData(string queryCondition)
+        public IEnumerable<T> QueryData(object condition = null)
         {
-            var result = mysqlConnection.Query<T>(queryCondition);
+            if (condition != null)
+            {
+                var result = mysqlConnection.GetList<T>(condition);
+                return result;
+            }
+            else
+            {
+                var result = mysqlConnection.GetList<T>();
+                return result;
+            }
+        }
+
+        public IEnumerable<T> QueryData(string condition)
+        {
+            var result = mysqlConnection.GetList<T>(condition);
             return result;
         }
 
-        public void SetParam(string key, string value)
+        public int DeleteData(object delCondition)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Close()
-        {
-            mysqlConnection.Close();
+            return mysqlConnection.DeleteList<T>(delCondition);
         }
 
         public int DeleteData(string delCondition)
         {
-            return mysqlConnection.Execute(delCondition);
+            return mysqlConnection.DeleteList<T>(delCondition);
         }
+
     }
 }
