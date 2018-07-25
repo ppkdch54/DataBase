@@ -30,12 +30,13 @@ namespace DataBase
                 + ";user=" + user
                 + ";pwd=" + password + ";";
             mysqlConnection = new MySqlConnection(connStr);
-            
+            Dapper.SimpleCRUD.SetDialect(Dapper.SimpleCRUD.Dialect.MySQL);
         }
 
         public bool Connect()
         {
             mysqlConnection.Open();
+            mysqlConnection.ChangeDatabase("test");
             return true;
         }
 
