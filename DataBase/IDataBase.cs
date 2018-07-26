@@ -1,7 +1,11 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
-
+/// <summary>
+/// 参数表管理用户参数
+/// 管理实时数据表
+/// 管理扩展的数据表
+/// </summary>
 namespace DataBase
 {
     interface IDataBase<T> where T : RealTimeData
