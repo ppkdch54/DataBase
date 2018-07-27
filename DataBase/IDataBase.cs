@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// </summary>
 namespace DataBase
 {
-    interface IDataBase<T> where T : RealTimeData
+    interface IDataBase
     {
         /// <summary>
         /// 连接数据库
@@ -39,28 +39,28 @@ namespace DataBase
         /// </summary>
         /// <param name="data">待写入的数据</param>
         /// <returns></returns>
-        void InsertData(T data);
+        void InsertData<T>(T data);
 
         /// <summary>
         /// 查询数据
         /// </summary>
         /// <param name="queryCondition">查询条件</param>
         /// <returns>返回的数据集合</returns>
-        IEnumerable<T> QueryData(object queryCondition);
+        IEnumerable<T> QueryData<T>(object queryCondition);
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="delCondition">删除条件</param>
         /// <returns>受影响数据数量</returns>
-        int DeleteData(object delCondition);
+        int DeleteData<T>(object delCondition);
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="delCondition">删除条件,必须用where开头的字符串条件</param>
         /// <returns>受影响数据数量</returns>
-        int DeleteData(string delConditionWhere);
+        int DeleteData<T>(string delConditionWhere);
     }
 
     public class Para
@@ -77,7 +77,11 @@ namespace DataBase
     {
         [Key]
         public int Id { get; set; }
-        public int Value { get; set; }
-        public DateTime DateTime { get; set; }
+        public int SiteNumber { get; set; }
+        public int SensorNumber { get; set; }
+        public float OriginValue { get; set; }
+        public float CalcValue { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
     }
 }
