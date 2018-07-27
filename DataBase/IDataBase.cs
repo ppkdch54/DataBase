@@ -26,7 +26,7 @@ namespace DataBase
         /// </summary>
         /// <param name="name">参数名称</param>
         /// <returns>参数值</returns>
-        Para GetParam(string name);
+        IEnumerable<Para> GetParam(string name);
 
         /// <summary>
         /// 写入参数 

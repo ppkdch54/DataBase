@@ -218,9 +218,9 @@ namespace DataBase
             mysqlConnection.Insert(para);
         }
 
-        public Para GetParam(string name)
+        public IEnumerable<Para> GetParam(string name)
         {
-            return mysqlConnection.Get<Para>(new Para { Name = name });
+            return mysqlConnection.GetList<Para>(new { Name = name });
         }
 
         public void InsertData<T>(T t)
