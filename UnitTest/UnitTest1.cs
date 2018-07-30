@@ -23,9 +23,25 @@ namespace UnitTest
             this.scope.Dispose();
         }
     }
+    class realtimedata_min : RealTimeData
+    {
+
+    }
+    class realtimedata_hour : RealTimeData
+    {
+
+    }
+    class realtimedata_day : RealTimeData
+    {
+
+    }
+    class realtimedata_month : RealTimeData
+    {
+
+    }
 
     [TestClass]
-    public class UnitTest1:DbTestBase
+    public class UnitTest1
     {
         static MySQLHelper mySQLHelper;
         [ClassInitialize]
@@ -69,7 +85,6 @@ namespace UnitTest
             Debug.WriteLine("realtime!");
             foreach (var item in data)
             {
-                //Console.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
                 Debug.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
             }
         }
@@ -79,6 +94,10 @@ namespace UnitTest
         public void DeleteData()
         {
             mySQLHelper.DeleteData<RealTimeData>();
+            mySQLHelper.DeleteData<realtimedata_min>();
+            mySQLHelper.DeleteData<realtimedata_hour>();
+            mySQLHelper.DeleteData<realtimedata_day>();
+            mySQLHelper.DeleteData<realtimedata_month>();
         }
 
         [TestMethod,Priority(9)]
