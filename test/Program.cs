@@ -29,8 +29,8 @@ namespace test
             realtimedata myClass = new realtimedata() { OriginValue = 9, CreatedTime = DateTime.Now };
             for (int i = 0; i < 100; i++)
             {
-                //myClass.SiteNumber = null;
-                //myClass.SensorNumber = i % 4;
+                myClass.SiteNumber = 0;
+                myClass.SensorNumber = 0;
                 myClass.CreatedTime = myClass.CreatedTime.Value.AddSeconds(10);
                 myClass.OriginValue = i;
                 mySQLHelper.InsertData(myClass);
