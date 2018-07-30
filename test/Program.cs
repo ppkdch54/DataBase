@@ -7,6 +7,7 @@ namespace test
     [Table("realtimedata")]
     class realtimedata : RealTimeData
     {
+
     }
     class realtimedata_min :RealTimeData
     {
@@ -23,12 +24,14 @@ namespace test
             string password = "123456";
             MySQLHelper mySQLHelper = new MySQLHelper(server, port, user, password);
             mySQLHelper.Connect();
-            mySQLHelper.DeleteData<realtimedata>();
+            //mySQLHelper.DeleteData<realtimedata>();
             //构造需要存储的数据条目
             realtimedata myClass = new realtimedata() { OriginValue = 9, CreatedTime = DateTime.Now };
             for (int i = 0; i < 100; i++)
             {
-                myClass.CreatedTime = myClass.CreatedTime.AddSeconds(10);
+                myClass.SiteNumber = null;
+                myClass.SensorNumber = i % 4;
+                myClass.CreatedTime = myClass.CreatedTime.Value.AddSeconds(10);
                 myClass.OriginValue = i;
                 mySQLHelper.InsertData(myClass);
             }
@@ -39,10 +42,10 @@ namespace test
             Console.WriteLine("realtime!");
             foreach (var item in data)
             {
-                Console.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
+                Console.WriteLine(item.Id + ": "+item.SiteNumber+"," + item.OriginValue + ", " + item.CreatedTime);
             }
             //查询所有分钟数据,并显示
-            var data_min = mySQLHelper.QueryData<realtimedata_min>();
+            var data_min = mySQLHelper.QueryData<realtimedata_min>("where id > 30");
             Console.WriteLine("realtime_min!");
             foreach (var item in data_min)
             {

@@ -77,11 +77,11 @@ namespace DataBase
     {
         [Key]
         public int Id { get; set; }
-        public int SiteNumber { get; set; }
-        public int SensorNumber { get; set; }
-        public float OriginValue { get; set; }
-        public float CalcValue { get; set; }
-        public DateTime CreatedTime { get; set; }
-        public DateTime UpdatedTime { get; set; }
+        public int? SiteNumber { get; set; }
+        public int? SensorNumber { get; set; }
+        public float? OriginValue { get; set; }
+        public float? CalcValue { get; set; }
+        public DateTime? CreatedTime { get; set; }
+        public DateTime? UpdatedTime { get; set; }
     }
 }

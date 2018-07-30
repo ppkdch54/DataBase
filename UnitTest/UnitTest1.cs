@@ -1,11 +1,31 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Transactions;
 using DataBase;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest
 {
     [TestClass]
-    public class UnitTest1
+    public class DbTestBase
+    {
+        private TransactionScope scope;
+   
+        [TestInitialize]
+        public void SetUp()
+        {
+            this.scope = new TransactionScope();
+        }
+          
+        [TestCleanup]
+        public void TearDown()
+        {
+            this.scope.Dispose();
+        }
+    }
+
+    [TestClass]
+    public class UnitTest1:DbTestBase
     {
         static MySQLHelper mySQLHelper;
         [ClassInitialize]
@@ -33,13 +53,35 @@ namespace UnitTest
             RealTimeData myClass = new RealTimeData() { CreatedTime = DateTime.Now };
             for (int i = 0; i < 100; i++)
             {
-                myClass.CreatedTime = myClass.CreatedTime.AddSeconds(10);
+                myClass.CreatedTime = myClass.CreatedTime.Value.AddSeconds(10);
                 myClass.OriginValue = i;
                 mySQLHelper.InsertData(myClass);
             }
         }
 
-        [TestMethod,Priority(100)]
+
+        [TestMethod]
+        [Priority(2)]
+        public void QueryData()
+        {
+            //查询所有实时数据,并显示
+            var data = mySQLHelper.QueryData<RealTimeData>();
+            Debug.WriteLine("realtime!");
+            foreach (var item in data)
+            {
+                //Console.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
+                Debug.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
+            }
+        }
+
+        [TestMethod]
+        [Priority(3)]
+        public void DeleteData()
+        {
+            mySQLHelper.DeleteData<RealTimeData>();
+        }
+
+        [TestMethod,Priority(9)]
         public void DisConnectTest()
         {
             //断开数据库连接
