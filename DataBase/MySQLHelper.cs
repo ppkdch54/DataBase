@@ -1,14 +1,22 @@
 ﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using Dapper;
-using System;
 
 namespace DataBase
 {
     public class MySQLHelper : IDataBase
     {
         MySqlConnection mysqlConnection;
-        public MySQLHelper(string server, string port, string user, string password)
+        bool isStatistics;
+        /// <summary>
+        /// 配置数据库连接参数
+        /// </summary>
+        /// <param name="server">数据库服务器地址</param>
+        /// <param name="port">数据库服务器端口</param>
+        /// <param name="user">用户名</param>
+        /// <param name="password">密码</param>
+        /// <param name="isStatistics">是否需要统计实时数据</param>
+        public MySQLHelper(string server, string port, string user, string password, bool isStatistics=true)
         {
             string connStr = "datasource=" + server
                 + ";port=" + port
@@ -16,34 +24,48 @@ namespace DataBase
                 + ";pwd=" + password + ";";
             mysqlConnection = new MySqlConnection(connStr);
             SimpleCRUD.SetDialect(SimpleCRUD.Dialect.MySQL);
+            this.isStatistics = isStatistics;
         }
-
+        /// <summary>
+        /// 连接数据库
+        /// </summary>
+        /// <returns>连接是否成功</returns>
         public bool Connect()
         {
-            mysqlConnection.Open();
-            string cmdStr = "SELECT * FROM sys.schema_table_statistics where TABLE_SCHEMA='test'; ";
-            System.Data.IDataReader result = mysqlConnection.ExecuteReader(cmdStr);
-            bool isExist = result.Read();
-            result.Close();
-            if (!isExist)
+            try
             {
-                //创建数据库
-                mysqlConnection.Execute(@"CREATE DATABASE `test` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;");
-                mysqlConnection.ChangeDatabase("test");
-                //创建6张表
-                string[] tableNames = new string[] { "", "_month", "_day", "_hour", "_min" };
-                foreach (var name in tableNames)
+                mysqlConnection.Open();
+                string cmdStr = "SELECT * FROM sys.schema_table_statistics where TABLE_SCHEMA='sxddck_db'; ";
+                System.Data.IDataReader result = mysqlConnection.ExecuteReader(cmdStr);
+                bool isExist = result.Read();
+                result.Close();
+                if (!isExist)
                 {
-                    CreateTable(name);
+                    //创建数据库
+                    mysqlConnection.Execute(@"CREATE DATABASE `sxddck_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;");
+                    mysqlConnection.ChangeDatabase("sxddck_db");
+                    //创建6张表
+                    string[] tableNames = isStatistics ? new string[] { "", "_month", "_day", "_hour", "_min" } : new string[] { "" };
+                    foreach (var name in tableNames)
+                    {
+                        CreateTable(name);
+                    }
+                    //创建参数表
+                    CreateParaTable();
+                    if (isStatistics)
+                    {
+                        //创建统计触发器
+                        CreateTriggers();
+                    }
                 }
-                //创建参数表
-                CreateParaTable();
-                //创建统计触发器
-                CreateTriggers();
+                else
+                {
+                    mysqlConnection.ChangeDatabase("sxddck_db");
+                }
             }
-            else
+            catch (System.Exception)
             {
-                mysqlConnection.ChangeDatabase("test");
+                return false;
             }
             return true;
         }
@@ -177,12 +199,15 @@ namespace DataBase
                 end
             ");
         }
-
+        /// <summary>
+        /// 断开连接
+        /// </summary>
         public void Disconnect()
         {
             mysqlConnection.Close();
         }
-        public void CreateParaTable()
+
+        private void CreateParaTable()
         {
             mysqlConnection.Execute(
                 @"CREATE TABLE `para` (
@@ -195,7 +220,7 @@ namespace DataBase
                 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
             );
         }
-        public void CreateTable(string tableName)
+        private void CreateTable(string tableName)
         {
             //创建表
             mysqlConnection.Execute(
@@ -212,22 +237,38 @@ namespace DataBase
                 ) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci"
             );
         }
-
-        public void SetParam(Para para)
+        /// <summary>
+        /// 存入参数
+        /// </summary>
+        /// <param name="para">参数值</param>
+        public void InsertParam(Para para)
         {
             mysqlConnection.Insert(para);
         }
-
-        public IEnumerable<Para> GetParam(string name)
+        /// <summary>
+        /// 查询参数
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>返回参数集合</returns>
+        public IEnumerable<Para> QueryParam(string name)
         {
             return mysqlConnection.GetList<Para>(new { Name = name });
         }
-
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <typeparam name="T">数据库映射类</typeparam>
+        /// <param name="t">数据</param>
         public void InsertData<T>(T t)
         {
             mysqlConnection.Insert(t);
         }
-
+        /// <summary>
+        /// 查询数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
+        /// <returns></returns>
         public IEnumerable<T> QueryData<T>(object condition = null)
         {
             if (condition != null)

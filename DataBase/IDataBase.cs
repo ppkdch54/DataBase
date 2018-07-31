@@ -22,17 +22,17 @@ namespace DataBase
         void Disconnect();
 
         /// <summary>
-        /// 读取参数
+        /// 查询参数
         /// </summary>
         /// <param name="name">参数名称</param>
         /// <returns>参数值</returns>
-        IEnumerable<Para> GetParam(string name);
+        IEnumerable<Para> QueryParam(string name);
 
         /// <summary>
         /// 写入参数 
         /// </summary>
         /// <param name="para">参数</param>
-        void SetParam(Para para);
+        void InsertParam(Para para);
 
         /// <summary>
         /// 写入数据或修改数据
