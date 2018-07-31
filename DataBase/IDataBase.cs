@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 /// <summary>
-/// 参数表管理用户参数
-/// 管理实时数据表
-/// 管理扩展的数据表
+/// 参数表
+/// 实时数据表
 /// </summary>
 namespace DataBase
 {
@@ -26,13 +25,13 @@ namespace DataBase
         /// </summary>
         /// <param name="name">参数名称</param>
         /// <returns>参数值</returns>
-        IEnumerable<Para> QueryParam(string name);
+        IEnumerable<Param> QueryParam(string name);
 
         /// <summary>
         /// 写入参数 
         /// </summary>
         /// <param name="para">参数</param>
-        void InsertParam(Para para);
+        void InsertParam(Param para);
 
         /// <summary>
         /// 写入数据或修改数据
@@ -63,14 +62,12 @@ namespace DataBase
         int DeleteData<T>(string delConditionWhere);
     }
 
-    public class Para
+    public class Param
     {
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Type { get; set; }
         public string Value { get; set; }
-        public int AffectZone { get; set; }
     }
 
     public class RealTimeData

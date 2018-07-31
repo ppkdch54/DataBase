@@ -16,7 +16,7 @@ namespace DataBase
         /// <param name="user">用户名</param>
         /// <param name="password">密码</param>
         /// <param name="isStatistics">是否需要统计实时数据</param>
-        public MySQLHelper(string server, string port, string user, string password, bool isStatistics=true)
+        public MySQLHelper(string server, string port, string user, string password, bool isStatistics = true)
         {
             string connStr = "datasource=" + server
                 + ";port=" + port
@@ -213,9 +213,7 @@ namespace DataBase
                 @"CREATE TABLE `para` (
                 `Id` int(11) NOT NULL AUTO_INCREMENT,
                 `Name` varchar(45) DEFAULT NULL,
-                `Type` varchar(45) DEFAULT NULL,
                 `Value` varchar(45) DEFAULT NULL,
-                `AffectZone` int(11) DEFAULT NULL,
                 PRIMARY KEY (`Id`)
                 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
             );
@@ -224,7 +222,7 @@ namespace DataBase
         {
             //创建表
             mysqlConnection.Execute(
-                @"CREATE TABLE `realtimedata"+tableName+ @"` (
+                @"CREATE TABLE `realtimedata" + tableName + @"` (
                 `Id` int(11) NOT NULL AUTO_INCREMENT,
                 `SiteNumber` int(11) DEFAULT NULL,
                 `SensorNumber` int(11) DEFAULT NULL,
@@ -240,28 +238,28 @@ namespace DataBase
         /// <summary>
         /// 存入参数
         /// </summary>
-        /// <param name="para">参数值</param>
-        public void InsertParam(Para para)
+        /// <param name="param">参数值</param>
+        public void InsertParam(Param param)
         {
-            mysqlConnection.Insert(para);
+            mysqlConnection.Insert(param);
         }
         /// <summary>
         /// 查询参数
         /// </summary>
         /// <param name="name"></param>
         /// <returns>返回参数集合</returns>
-        public IEnumerable<Para> QueryParam(string name)
+        public IEnumerable<Param> QueryParam(string name)
         {
-            return mysqlConnection.GetList<Para>(new { Name = name });
+            return mysqlConnection.GetList<Param>(new { Name = name });
         }
         /// <summary>
         /// 插入数据
         /// </summary>
         /// <typeparam name="T">数据库映射类</typeparam>
-        /// <param name="t">数据</param>
-        public void InsertData<T>(T t)
+        /// <param name="data">数据</param>
+        public void InsertData<T>(T data)
         {
-            mysqlConnection.Insert(t);
+            mysqlConnection.Insert(data);
         }
         /// <summary>
         /// 查询数据
@@ -283,13 +281,13 @@ namespace DataBase
             }
         }
 
-        public IEnumerable<T> QueryData<T>(string condition)
+        public IEnumerable<T> QueryData<T>(string condition, object param = null)
         {
-            var result = mysqlConnection.GetList<T>(condition);
+            var result = mysqlConnection.GetList<T>(condition, param);
             return result;
         }
 
-        public int DeleteData<T>(object delCondition=null)
+        public int DeleteData<T>(object delCondition = null)
         {
             return mysqlConnection.DeleteList<T>(delCondition);
         }

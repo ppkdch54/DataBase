@@ -38,9 +38,12 @@ namespace test
             //构造删除数据的条件,并删除符合条件的数据库内容
             //mySQLHelper.DeleteData<realtimedata>(new { OriginValue = 99 });
             //查询所有实时数据,并显示
-            var data = mySQLHelper.QueryData<realtimedata>();
+            DynamicParameters dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("CreatedTime", DateTime.Now.AddSeconds(60));
+            var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
+
             Console.WriteLine("realtime!");
-            foreach (var item in data)
+            foreach (var item in result)
             {
                 Console.WriteLine(item.Id + ": "+item.SiteNumber+"," + item.OriginValue + ", " + item.CreatedTime);
             }
@@ -52,14 +55,13 @@ namespace test
             //    Console.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
             //}
             //构造参数条目,并存储
-            Para para = new Para() { Name = "标题", Value = "戴德测控", Type = "string", AffectZone = 0 };
+            Param para = new Param() { Name = "标题", Value = "戴德测控" };
             mySQLHelper.InsertParam(para);
             var pr = mySQLHelper.QueryParam("标题");
             foreach (var item in pr)
             {
                 Console.WriteLine("para:" + item.Value);
             }
-            
             //断开数据库连接
             mySQLHelper.Disconnect();
             //示例程序结束标志
