@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using Dapper;
+using System;
 
 namespace DataBase
 {
@@ -69,7 +70,6 @@ namespace DataBase
             }
             return true;
         }
-
         private void CreateTriggers()
         {
             mysqlConnection.Execute(@"
@@ -206,11 +206,10 @@ namespace DataBase
         {
             mysqlConnection.Close();
         }
-
         private void CreateParaTable()
         {
             mysqlConnection.Execute(
-                @"CREATE TABLE `para` (
+                @"CREATE TABLE `param` (
                 `Id` int(11) NOT NULL AUTO_INCREMENT,
                 `Name` varchar(45) DEFAULT NULL,
                 `Value` varchar(45) DEFAULT NULL,
@@ -253,21 +252,38 @@ namespace DataBase
             return mysqlConnection.GetList<Param>(new { Name = name });
         }
         /// <summary>
+        /// 依据参数名删除参数表
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int DeleteParam(string name)
+        {
+            return mysqlConnection.DeleteList<Param>(new { Name=name });
+        }
+        /// <summary>
+        /// 删除所有参数
+        /// </summary>
+        /// <returns></returns>
+        public int DeleteAllParams()
+        {
+            return mysqlConnection.DeleteList<Param>("where Id <> -1");
+        }
+        /// <summary>
         /// 插入数据
         /// </summary>
         /// <typeparam name="T">数据库映射类</typeparam>
         /// <param name="data">数据</param>
-        public void InsertData<T>(T data)
+        public void InsertData<T>(T data) where T:RealTimeData
         {
             mysqlConnection.Insert(data);
         }
         /// <summary>
-        /// 查询数据
+        /// 查询数据,该接口暂时不开放
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public IEnumerable<T> QueryData<T>(object condition = null)
+        private IEnumerable<T> QueryData<T>(object condition = null) where T : RealTimeData
         {
             if (condition != null)
             {
@@ -280,22 +296,49 @@ namespace DataBase
                 return result;
             }
         }
-
-        public IEnumerable<T> QueryData<T>(string condition, object param = null)
+        /// <summary>
+        /// 特殊数据查询接口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        internal IEnumerable<T> QueryData<T>(string condition, object param = null) where T : RealTimeData
         {
             var result = mysqlConnection.GetList<T>(condition, param);
             return result;
         }
-
-        public int DeleteData<T>(object delCondition = null)
+        /// <summary>
+        /// 用开始和结束时间进行查询的接口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="startTime">查询起始时间</param>
+        /// <param name="endTime">查询结束时间</param>
+        /// <returns>返回可枚举的记录集合</returns>
+        public IEnumerable<T> QueryData<T>(DateTime startTime, DateTime endTime) where T : RealTimeData
+        {
+            DynamicParameters dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("startTime", startTime);
+            dynamicParameters.Add("endTime", endTime);
+            return QueryData<T>(@"where CreatedTime >= @startTime and CreatedTime <= @endTime",dynamicParameters);
+        }
+        public int DeleteData<T>(object delCondition = null) where T : RealTimeData
         {
             return mysqlConnection.DeleteList<T>(delCondition);
         }
-
-        public int DeleteData<T>(string delCondition)
+        private int DeleteData<T>(string delCondition) where T : RealTimeData
         {
             return mysqlConnection.DeleteList<T>(delCondition);
         }
-
     }
+    public class realtimedata : RealTimeData
+    { }
+    public class realtimedata_min : RealTimeData
+    { }
+    public class realtimedata_hour : RealTimeData
+    { }
+    public class realtimedata_day : RealTimeData
+    { }
+    public class realtimedata_month : RealTimeData
+    { }
 }

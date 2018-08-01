@@ -81,12 +81,12 @@ namespace UnitTest
         public void QueryData()
         {
             //查询所有实时数据,并显示
-            var data = mySQLHelper.QueryData<RealTimeData>();
-            Debug.WriteLine("realtime!");
-            foreach (var item in data)
-            {
-                Debug.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
-            }
+            //var data = mySQLHelper.QueryData<RealTimeData>();
+            //Debug.WriteLine("realtime!");
+            //foreach (var item in data)
+            //{
+            //    Debug.WriteLine(item.Id + ": " + item.OriginValue + ", " + item.CreatedTime);
+            //}
         }
 
         [TestMethod]

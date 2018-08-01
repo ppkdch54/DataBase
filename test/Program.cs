@@ -4,15 +4,6 @@ using DataBase;
 
 namespace test
 {
-    [Table("realtimedata")]
-    class realtimedata : RealTimeData
-    {
-
-    }
-    class realtimedata_min :RealTimeData
-    {
-
-    }
     class Program
     {
         static void Main(string[] args)
@@ -24,6 +15,12 @@ namespace test
             string password = "123456";
             MySQLHelper mySQLHelper = new MySQLHelper(server, port, user, password,false);
             mySQLHelper.Connect();
+            mySQLHelper.DeleteAllParams();
+            var r = mySQLHelper.QueryData<realtimedata>(DateTime.Parse("2018-08-01 09:24:57"), DateTime.Parse("2018-08-01 09:25:47"));
+            foreach (var item in r)
+            {
+                Console.WriteLine(item.Id + ": " + item.SiteNumber + "," + item.OriginValue + ", " + item.CreatedTime);
+            }
             //mySQLHelper.DeleteData<realtimedata>();
             //构造需要存储的数据条目
             realtimedata myClass = new realtimedata() { OriginValue = 9, CreatedTime = DateTime.Now };
@@ -40,13 +37,13 @@ namespace test
             //查询所有实时数据,并显示
             DynamicParameters dynamicParameters = new DynamicParameters();
             dynamicParameters.Add("CreatedTime", DateTime.Now.AddSeconds(60));
-            var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
+            //var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
 
-            Console.WriteLine("realtime!");
-            foreach (var item in result)
-            {
-                Console.WriteLine(item.Id + ": "+item.SiteNumber+"," + item.OriginValue + ", " + item.CreatedTime);
-            }
+            //Console.WriteLine("realtime!");
+            //foreach (var item in result)
+            //{
+            //    Console.WriteLine(item.Id + ": "+item.SiteNumber+"," + item.OriginValue + ", " + item.CreatedTime);
+            //}
             ////查询所有分钟数据,并显示
             //var data_min = mySQLHelper.QueryData<realtimedata_min>("where id > 30");
             //Console.WriteLine("realtime_min!");

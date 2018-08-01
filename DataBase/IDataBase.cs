@@ -25,7 +25,7 @@ namespace DataBase
         /// </summary>
         /// <param name="name">参数名称</param>
         /// <returns>参数值</returns>
-        IEnumerable<Param> QueryParam(string name);
+        //IEnumerable<Param> QueryParam(string name);
 
         /// <summary>
         /// 写入参数 
@@ -38,28 +38,28 @@ namespace DataBase
         /// </summary>
         /// <param name="data">待写入的数据</param>
         /// <returns></returns>
-        void InsertData<T>(T data);
+        void InsertData<T>(T data) where T : RealTimeData;
 
         /// <summary>
         /// 查询数据
         /// </summary>
         /// <param name="queryCondition">查询条件</param>
         /// <returns>返回的数据集合</returns>
-        IEnumerable<T> QueryData<T>(object queryCondition);
+        //IEnumerable<T> QueryData<T>(object queryCondition);
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="delCondition">删除条件</param>
         /// <returns>受影响数据数量</returns>
-        int DeleteData<T>(object delCondition);
+        int DeleteData<T>(object delCondition) where T : RealTimeData;
 
         /// <summary>
         /// 删除数据
         /// </summary>
         /// <param name="delCondition">删除条件,必须用where开头的字符串条件</param>
         /// <returns>受影响数据数量</returns>
-        int DeleteData<T>(string delConditionWhere);
+        //int DeleteData<T>(string delConditionWhere);
     }
 
     public class Param
