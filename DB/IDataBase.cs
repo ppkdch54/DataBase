@@ -61,7 +61,9 @@ namespace DataBase
         /// <returns>受影响数据数量</returns>
         //int DeleteData<T>(string delConditionWhere);
     }
-
+    /// <summary>
+    /// 参数表数据结构
+    /// </summary>
     public class Param
     {
         [Key]
@@ -69,7 +71,9 @@ namespace DataBase
         public string Name { get; set; }
         public string Value { get; set; }
     }
-
+    /// <summary>
+    /// 实时表数据结构
+    /// </summary>
     public class RealTimeData
     {
         [Key]
