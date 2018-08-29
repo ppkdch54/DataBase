@@ -36,14 +36,14 @@ namespace DataBase
             try
             {
                 mysqlConnection.Open();
-                string cmdStr = "SELECT * FROM sys.schema_table_statistics where TABLE_SCHEMA='sxddck_db'; ";
+                string cmdStr = "SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME='sxddck_db'; ";
                 System.Data.IDataReader result = mysqlConnection.ExecuteReader(cmdStr);
                 bool isExist = result.Read();
                 result.Close();
                 if (!isExist)
                 {
                     //创建数据库
-                    mysqlConnection.Execute(@"CREATE DATABASE `sxddck_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;");
+                    mysqlConnection.Execute(@"CREATE DATABASE `sxddck_db`;");
                     mysqlConnection.ChangeDatabase("sxddck_db");
                     //创建6张表
                     string[] tableNames = isStatistics ? new string[] { "", "_month", "_day", "_hour", "_min" } : new string[] { "" };
@@ -64,7 +64,7 @@ namespace DataBase
                     mysqlConnection.ChangeDatabase("sxddck_db");
                 }
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 return false;
             }
