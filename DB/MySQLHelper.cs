@@ -22,7 +22,7 @@ namespace DataBase
             string connStr = "datasource=" + server
                 + ";port=" + port
                 + ";user=" + user
-                + ";pwd=" + password + ";";
+                + ";pwd=" + password + ";SslMode = none;";
             mysqlConnection = new MySqlConnection(connStr);
             SimpleCRUD.SetDialect(SimpleCRUD.Dialect.MySQL);
             this.isStatistics = isStatistics;
@@ -66,7 +66,7 @@ namespace DataBase
             }
             catch (System.Exception ex)
             {
-                return false;
+                throw ex;
             }
             return true;
         }
@@ -214,7 +214,7 @@ namespace DataBase
                 `Name` varchar(45) DEFAULT NULL,
                 `Value` varchar(45) DEFAULT NULL,
                 PRIMARY KEY (`Id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+                ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8"
             );
         }
         private void CreateTable(string tableName)
@@ -231,7 +231,7 @@ namespace DataBase
                 `CreatedTime` datetime DEFAULT NULL,
                 `UpdatedTime` datetime DEFAULT NULL,
                 PRIMARY KEY(`Id`)
-                ) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci"
+                ) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET=utf8"
             );
         }
         /// <summary>
@@ -303,7 +303,7 @@ namespace DataBase
         /// <param name="condition"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        internal IEnumerable<T> QueryData<T>(string condition, object param = null) where T : RealTimeData
+        public IEnumerable<T> QueryData<T>(string condition, object param = null) where T : RealTimeData
         {
             var result = mysqlConnection.GetList<T>(condition, param);
             return result;

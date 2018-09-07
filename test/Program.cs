@@ -14,14 +14,22 @@ namespace test
             string user = "root";
             string password = "123456";
             MySQLHelper mySQLHelper = new MySQLHelper(server, port, user, password,false);
-            mySQLHelper.Connect();
+            if (!mySQLHelper.Connect())
+            {
+                Console.WriteLine("Connect fail!");
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Connect success!");
+            }
             mySQLHelper.DeleteAllParams();
             var r = mySQLHelper.QueryData<realtimedata>(DateTime.Parse("2018-08-01 09:24:57"), DateTime.Parse("2018-08-01 09:25:47"));
             foreach (var item in r)
             {
                 Console.WriteLine(item.Id + ": " + item.SiteNumber + "," + item.OriginValue + ", " + item.CreatedTime);
             }
-            //mySQLHelper.DeleteData<realtimedata>();
+            mySQLHelper.DeleteData<realtimedata>();
             //构造需要存储的数据条目
             realtimedata myClass = new realtimedata() { OriginValue = 9, CreatedTime = DateTime.Now };
             for (int i = 0; i < 100; i++)
@@ -37,13 +45,14 @@ namespace test
             //查询所有实时数据,并显示
             DynamicParameters dynamicParameters = new DynamicParameters();
             dynamicParameters.Add("CreatedTime", DateTime.Now.AddSeconds(60));
-            //var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
+            var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
 
-            //Console.WriteLine("realtime!");
-            //foreach (var item in result)
-            //{
-            //    Console.WriteLine(item.Id + ": "+item.SiteNumber+"," + item.OriginValue + ", " + item.CreatedTime);
-            //}
+            Console.WriteLine("realtime!");
+            foreach (var item in result)
+            {
+                Console.WriteLine(item.Id + ": " + item.SiteNumber + "," + item.OriginValue + ", " + item.CreatedTime);
+            }
+            Console.WriteLine("QueryData success!");
             ////查询所有分钟数据,并显示
             //var data_min = mySQLHelper.QueryData<realtimedata_min>("where id > 30");
             //Console.WriteLine("realtime_min!");
@@ -59,10 +68,11 @@ namespace test
             {
                 Console.WriteLine("para:" + item.Value);
             }
+            Console.WriteLine("QueryParam Success!");
             //断开数据库连接
             mySQLHelper.Disconnect();
             //示例程序结束标志
-            Console.WriteLine("Success!");
+            Console.WriteLine("Disconnect Success!");
             Console.ReadKey();
         }
     }
