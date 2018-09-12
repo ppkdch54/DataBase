@@ -1,10 +1,6 @@
 ﻿using Dapper;
 using System;
-using System.Collections.Generic;
-/// <summary>
-/// 参数表
-/// 实时数据表
-/// </summary>
+
 namespace DataBase
 {
     interface IDataBase
@@ -66,9 +62,18 @@ namespace DataBase
     /// </summary>
     public class Param
     {
+        /// <summary>
+        /// 数据库主键
+        /// </summary>
         [Key]
         public int Id { get; set; }
+        /// <summary>
+        /// 参数名称
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 参数值
+        /// </summary>
         public string Value { get; set; }
     }
     /// <summary>
@@ -76,13 +81,34 @@ namespace DataBase
     /// </summary>
     public class RealTimeData
     {
+        /// <summary>
+        /// 数据库主键
+        /// </summary>
         [Key]
         public int Id { get; set; }
+        /// <summary>
+        /// 站号
+        /// </summary>
         public int? SiteNumber { get; set; }
+        /// <summary>
+        /// 传感器编号
+        /// </summary>
         public int? SensorNumber { get; set; }
+        /// <summary>
+        /// 数据原始值
+        /// </summary>
         public float? OriginValue { get; set; }
+        /// <summary>
+        /// 计算值
+        /// </summary>
         public float? CalcValue { get; set; }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
         public DateTime? CreatedTime { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
         public DateTime? UpdatedTime { get; set; }
     }
 }

@@ -5,9 +5,16 @@ using System;
 
 namespace DataBase
 {
+    /// <summary>
+    /// 数据库模块
+    /// </summary>
     public class MySQLHelper : IDataBase
     {
         MySqlConnection mysqlConnection;
+        string connStr;
+        /// <summary>
+        /// 是否需要对原始数据进行统计
+        /// </summary>
         bool isStatistics;
         /// <summary>
         /// 配置数据库连接参数
@@ -19,7 +26,7 @@ namespace DataBase
         /// <param name="isStatistics">是否需要统计实时数据</param>
         public MySQLHelper(string server, string port, string user, string password, bool isStatistics = true)
         {
-            string connStr = "datasource=" + server
+            connStr = "datasource=" + server
                 + ";port=" + port
                 + ";user=" + user
                 + ";pwd=" + password + ";SslMode = none;";
@@ -69,6 +76,161 @@ namespace DataBase
                 throw ex;
             }
             return true;
+        }
+        /// <summary>
+        /// 断开数据库连接
+        /// </summary>
+        public void Disconnect()
+        {
+            mysqlConnection.Close();
+        }
+        /// <summary>
+        /// 存入参数
+        /// </summary>
+        /// <param name="param">参数值</param>
+        public void InsertParam(Param param)
+        {
+            using (mysqlConnection = GetOpenConnection())
+            {
+                mysqlConnection.Insert(param);
+            }
+        }
+        /// <summary>
+        /// 查询参数
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>返回参数集合</returns>
+        public IEnumerable<Param> QueryParam(string name)
+        {
+            IEnumerable<Param> retVals = null;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVals = mysqlConnection.GetList<Param>(new { Name = name });
+            }
+            return retVals;
+        }
+        /// <summary>
+        /// 依据参数名删除参数表
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int DeleteParam(string name)
+        {
+            int retVal = 0;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVal= mysqlConnection.DeleteList<Param>(new { Name = name });
+            }
+            return retVal;
+        }
+        /// <summary>
+        /// 删除所有参数
+        /// </summary>
+        /// <returns></returns>
+        public int DeleteAllParams()
+        {
+            int retVal = 0;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVal = mysqlConnection.DeleteList<Param>("where Id <> -1");
+            }
+            return retVal;
+        }
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <typeparam name="T">数据库映射类</typeparam>
+        /// <param name="data">数据</param>
+        public void InsertData<T>(T data) where T:RealTimeData
+        {
+            using (mysqlConnection = GetOpenConnection())
+            {
+                mysqlConnection.Insert(data);
+            }
+        }
+        /// <summary>
+        /// 查询数据,该接口暂时不开放
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        private IEnumerable<T> QueryData<T>(object condition = null) where T : RealTimeData
+        {
+            if (condition != null)
+            {
+                var result = mysqlConnection.GetList<T>(condition);
+                return result;
+            }
+            else
+            {
+                var result = mysqlConnection.GetList<T>();
+                return result;
+            }
+        }
+        /// <summary>
+        /// 特殊数据查询接口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public IEnumerable<T> QueryData<T>(string condition, object param = null) where T : RealTimeData
+        {
+            IEnumerable<T> result = null;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                result = mysqlConnection.GetList<T>(condition, param);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 用开始和结束时间进行查询的接口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="startTime">查询起始时间</param>
+        /// <param name="endTime">查询结束时间</param>
+        /// <returns>返回可枚举的记录集合</returns>
+        public IEnumerable<T> QueryData<T>(DateTime startTime, DateTime endTime) where T : RealTimeData
+        {
+            IEnumerable<T> result = null;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                DynamicParameters dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("startTime", startTime);
+                dynamicParameters.Add("endTime", endTime);
+                result = QueryData<T>(@"where CreatedTime >= @startTime and CreatedTime <= @endTime", dynamicParameters);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 依据单条件查询
+        /// </summary>
+        /// <typeparam name="T">查询表名称</typeparam>
+        /// <param name="delCondition">查询条件</param>
+        /// <returns>受影响的条目数</returns>
+        public int DeleteData<T>(object delCondition = null) where T : RealTimeData
+        {
+            int retVal = 0;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVal = mysqlConnection.DeleteList<T>(delCondition);
+            }
+            return retVal;
+        }
+        /// <summary>
+        /// where语句查询
+        /// </summary>
+        /// <typeparam name="T">查询表名称</typeparam>
+        /// <param name="delCondition">查询条件</param>
+        /// <returns>受影响的条目数</returns>
+        private int DeleteData<T>(string delCondition) where T : RealTimeData
+        {
+            int retVal = 0;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVal = mysqlConnection.DeleteList<T>(delCondition);
+            }
+            return retVal;
         }
         private void CreateTriggers()
         {
@@ -199,13 +361,6 @@ namespace DataBase
                 end
             ");
         }
-        /// <summary>
-        /// 断开连接
-        /// </summary>
-        public void Disconnect()
-        {
-            mysqlConnection.Close();
-        }
         private void CreateParaTable()
         {
             mysqlConnection.Execute(
@@ -234,111 +389,33 @@ namespace DataBase
                 ) ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET=utf8"
             );
         }
-        /// <summary>
-        /// 存入参数
-        /// </summary>
-        /// <param name="param">参数值</param>
-        public void InsertParam(Param param)
+        private MySqlConnection GetOpenConnection()
         {
-            mysqlConnection.Insert(param);
-        }
-        /// <summary>
-        /// 查询参数
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns>返回参数集合</returns>
-        public IEnumerable<Param> QueryParam(string name)
-        {
-            return mysqlConnection.GetList<Param>(new { Name = name });
-        }
-        /// <summary>
-        /// 依据参数名删除参数表
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public int DeleteParam(string name)
-        {
-            return mysqlConnection.DeleteList<Param>(new { Name=name });
-        }
-        /// <summary>
-        /// 删除所有参数
-        /// </summary>
-        /// <returns></returns>
-        public int DeleteAllParams()
-        {
-            return mysqlConnection.DeleteList<Param>("where Id <> -1");
-        }
-        /// <summary>
-        /// 插入数据
-        /// </summary>
-        /// <typeparam name="T">数据库映射类</typeparam>
-        /// <param name="data">数据</param>
-        public void InsertData<T>(T data) where T:RealTimeData
-        {
-            mysqlConnection.Insert(data);
-        }
-        /// <summary>
-        /// 查询数据,该接口暂时不开放
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        private IEnumerable<T> QueryData<T>(object condition = null) where T : RealTimeData
-        {
-            if (condition != null)
-            {
-                var result = mysqlConnection.GetList<T>(condition);
-                return result;
-            }
-            else
-            {
-                var result = mysqlConnection.GetList<T>();
-                return result;
-            }
-        }
-        /// <summary>
-        /// 特殊数据查询接口
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="condition"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public IEnumerable<T> QueryData<T>(string condition, object param = null) where T : RealTimeData
-        {
-            var result = mysqlConnection.GetList<T>(condition, param);
-            return result;
-        }
-        /// <summary>
-        /// 用开始和结束时间进行查询的接口
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="startTime">查询起始时间</param>
-        /// <param name="endTime">查询结束时间</param>
-        /// <returns>返回可枚举的记录集合</returns>
-        public IEnumerable<T> QueryData<T>(DateTime startTime, DateTime endTime) where T : RealTimeData
-        {
-            DynamicParameters dynamicParameters = new DynamicParameters();
-            dynamicParameters.Add("startTime", startTime);
-            dynamicParameters.Add("endTime", endTime);
-            return QueryData<T>(@"where CreatedTime >= @startTime and CreatedTime <= @endTime",dynamicParameters);
-        }
-        public int DeleteData<T>(object delCondition = null) where T : RealTimeData
-        {
-            return mysqlConnection.DeleteList<T>(delCondition);
-        }
-        private int DeleteData<T>(string delCondition) where T : RealTimeData
-        {
-            return mysqlConnection.DeleteList<T>(delCondition);
+            MySqlConnection mysqlConnection = new MySqlConnection(connStr);
+            mysqlConnection.Open();
+            mysqlConnection.ChangeDatabase("sxddck_db");
+            return mysqlConnection;
         }
     }
-    public class realtimedata : RealTimeData
-    { }
-    public class realtimedata_min : RealTimeData
-    { }
-    public class realtimedata_hour : RealTimeData
-    { }
-    public class realtimedata_day : RealTimeData
-    { }
-    public class realtimedata_month : RealTimeData
-    { }
+
+    /// <summary>
+    /// 原始数据表
+    /// </summary>
+    public class realtimedata : RealTimeData { }
+    /// <summary>
+    /// 按分钟统计
+    /// </summary>
+    public class realtimedata_min : RealTimeData { }
+    /// <summary>
+    /// 按小时统计
+    /// </summary>
+    public class realtimedata_hour : RealTimeData { }
+    /// <summary>
+    /// 按天统计
+    /// </summary>
+    public class realtimedata_day : RealTimeData { }
+    /// <summary>
+    /// 按月统计
+    /// </summary>
+    public class realtimedata_month : RealTimeData { }
 }

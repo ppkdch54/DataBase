@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dapper;
 using DataBase;
 
@@ -24,11 +26,14 @@ namespace test
                 Console.WriteLine("Connect success!");
             }
             mySQLHelper.DeleteAllParams();
-            var r = mySQLHelper.QueryData<realtimedata>(DateTime.Parse("2018-08-01 09:24:57"), DateTime.Parse("2018-08-01 09:25:47"));
-            foreach (var item in r)
+            Task.Run(() =>
             {
-                Console.WriteLine(item.Id + ": " + item.SiteNumber + "," + item.OriginValue + ", " + item.CreatedTime);
-            }
+                List<realtimedata> r = new List<realtimedata>( mySQLHelper.QueryData<realtimedata>(DateTime.Parse("2018-08-01 09:24:57"), DateTime.Parse("2018-08-01 09:25:47")));
+                foreach (var item in r)
+                {
+                    Console.WriteLine(item.Id + ": " + item.SiteNumber + "," + item.OriginValue + ", " + item.CreatedTime);
+                }
+            });
             mySQLHelper.DeleteData<realtimedata>();
             //构造需要存储的数据条目
             realtimedata myClass = new realtimedata() { OriginValue = 9, CreatedTime = DateTime.Now };
