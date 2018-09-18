@@ -29,7 +29,7 @@ namespace DataBase
             connStr = "datasource=" + server
                 + ";port=" + port
                 + ";user=" + user
-                + ";pwd=" + password + ";SslMode = none;";
+                + ";pwd=" + password + ";SslMode = none;charset=utf8";
             mysqlConnection = new MySqlConnection(connStr);
             SimpleCRUD.SetDialect(SimpleCRUD.Dialect.MySQL);
             this.isStatistics = isStatistics;
