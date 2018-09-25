@@ -382,6 +382,7 @@ namespace DataBase
                 `SensorNumber` int(11) DEFAULT NULL,
                 `OriginValue` float DEFAULT NULL,
                 `CalcValue` float DEFAULT NULL,
+                `SumData` float DEFAULT NULL,
                 `Count` int(11) DEFAULT NULL,
                 `CreatedTime` datetime DEFAULT NULL,
                 `UpdatedTime` datetime DEFAULT NULL,

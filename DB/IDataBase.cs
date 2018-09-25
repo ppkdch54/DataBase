@@ -110,5 +110,9 @@ namespace DataBase
         /// 更新时间
         /// </summary>
         public DateTime? UpdatedTime { get; set; }
+        /// <summary>
+        /// 累计值
+        /// </summary>
+        public float? SumData { get; set; }
     }
 }
