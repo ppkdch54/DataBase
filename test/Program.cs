@@ -69,11 +69,11 @@ namespace test
             Param para = new Param() { Name = "标题", Value = "戴德测控" };
             mySQLHelper.InsertParam(para);
             var pr = mySQLHelper.QueryParam("标题");
-            foreach (var item in pr)
+            if (pr!=null)
             {
-                Console.WriteLine("para:" + item.Value);
+                Console.WriteLine("para:" + pr.Value);
+                Console.WriteLine("QueryParam Success!");
             }
-            Console.WriteLine("QueryParam Success!");
             //断开数据库连接
             mySQLHelper.Disconnect();
             //示例程序结束标志

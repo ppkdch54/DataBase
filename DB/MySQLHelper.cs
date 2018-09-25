@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using Dapper;
 using System;
+using System.Linq;
 
 namespace DataBase
 {
@@ -98,14 +99,29 @@ namespace DataBase
         /// <summary>
         /// 查询参数
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">查询字段名称</param>
         /// <returns>返回参数集合</returns>
-        public IEnumerable<Param> QueryParam(string name)
+        public Param QueryParam(string name)
         {
             IEnumerable<Param> retVals = null;
             using (mysqlConnection = GetOpenConnection())
             {
                 retVals = mysqlConnection.GetList<Param>(new { Name = name });
+            }
+            return retVals.FirstOrDefault();
+        }
+        /// <summary>
+        /// 查询参数
+        /// </summary>
+        /// <param name="whereClause">条件语句</param>
+        /// <param name="param">条件参数</param>
+        /// <returns>返回参数集合</returns>
+        public IEnumerable<Param> QueryParamByCondition(string whereClause, object param = null)
+        {
+            IEnumerable<Param> retVals = null;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVals = mysqlConnection.GetList<Param>(whereClause,param);
             }
             return retVals;
         }
@@ -113,20 +129,35 @@ namespace DataBase
         /// 依据参数名删除参数表
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>受影响的条数</returns>
         public int DeleteParam(string name)
         {
             int retVal = 0;
             using (mysqlConnection = GetOpenConnection())
             {
-                retVal= mysqlConnection.DeleteList<Param>(new { Name = name });
+                retVal = mysqlConnection.DeleteList<Param>(new { Name = name });
+            }
+            return retVal;
+        }
+        /// <summary>
+        /// 依据where语句删除参数表
+        /// </summary>
+        /// <param name="whereClause">条件语句</param>
+        /// <param name="param">条件参数</param>
+        /// <returns>受影响的条数</returns>
+        public int DeleteParamyCondition(string whereClause, object param = null)
+        {
+            int retVal = 0;
+            using (mysqlConnection = GetOpenConnection())
+            {
+                retVal = mysqlConnection.DeleteList<Param>(whereClause,param);
             }
             return retVal;
         }
         /// <summary>
         /// 删除所有参数
         /// </summary>
-        /// <returns></returns>
+        /// <returns>受影响的条数</returns>
         public int DeleteAllParams()
         {
             int retVal = 0;
