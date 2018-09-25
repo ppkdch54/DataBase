@@ -145,7 +145,7 @@ namespace DataBase
         /// <param name="whereClause">条件语句</param>
         /// <param name="param">条件参数</param>
         /// <returns>受影响的条数</returns>
-        public int DeleteParamyCondition(string whereClause, object param = null)
+        public int DeleteParamByCondition(string whereClause, object param = null)
         {
             int retVal = 0;
             using (mysqlConnection = GetOpenConnection())
