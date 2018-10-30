@@ -35,9 +35,6 @@
     <Reference Include="Dapper, Version=1.50.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DataBasePackage.1.0.6\lib\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="Dapper.SimpleCRUD, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataBasePackage.1.0.6\lib\Dapper.SimpleCRUD.dll</HintPath>
-    </Reference>
     <Reference Include="DataBase, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DataBasePackage.1.0.6\lib\DataBase.dll</HintPath>
     </Reference>

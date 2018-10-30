@@ -50,7 +50,7 @@ namespace test
             //查询所有实时数据,并显示
             DynamicParameters dynamicParameters = new DynamicParameters();
             dynamicParameters.Add("CreatedTime", DateTime.Now.AddSeconds(60));
-            var result = mySQLHelper.QueryData<realtimedata>("where CreatedTime < @CreatedTime", dynamicParameters);
+            var result = mySQLHelper.QueryData<realtimedata>("");
 
             Console.WriteLine("realtime!");
             foreach (var item in result)
