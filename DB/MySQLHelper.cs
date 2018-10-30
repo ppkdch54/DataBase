@@ -185,12 +185,14 @@ namespace DataBase
         /// <typeparam name="T">数据库映射类</typeparam>
         /// <param name="sqlState">sql语句</param>
         /// <param name="param">语句参数</param>
-        public void Execute<T>(string sqlState, object param = null)
+        public int Execute<T>(string sqlState, object param = null)
         {
+            int ret = 0;
             using (mysqlConnection = GetOpenConnection())
             {
-                mysqlConnection.Execute(sqlState,param);
+                ret = mysqlConnection.Execute(sqlState, param);
             }
+            return ret;
         }
         /// <summary>
         /// 查询数据,该接口暂时不开放
